@@ -51,5 +51,7 @@ tasks.withType<KotlinCompile>() {
 }
 
 tasks.create("stage") {
-    dependsOn("shadowJar")
+    dependsOn("clean", "shadowJar")
 }
+
+tasks.getByName("shadowJar").mustRunAfter(tasks.getByName("clean"))
