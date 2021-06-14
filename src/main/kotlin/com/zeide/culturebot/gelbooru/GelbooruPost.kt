@@ -3,11 +3,9 @@ package com.zeide.culturebot.gelbooru
 import com.zeide.culturebot.httpClient
 import de.androidpit.colorthief.ColorThief
 import dev.kord.common.Color
-import dev.kord.core.behavior.MessageBehavior
-import dev.kord.core.behavior.channel.MessageChannelBehavior
-import dev.kord.core.behavior.channel.createEmbed
 import dev.kord.rest.builder.message.EmbedBuilder
 import io.ktor.client.request.*
+import io.ktor.http.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.Dispatchers
@@ -42,16 +40,21 @@ data class GelbooruPost(
     }
 
     companion object {
+        private val urlPattern = Regex("^(https://|http://)(?!-.)[^\\s/\$.?#].[^\\s]*$")
         private val prominentColorCache = mutableMapOf<Int, Color>()
 
         suspend fun EmbedBuilder.forPost(post: GelbooruPost) {
-            val optionalSource = if (post.source.isNotBlank())
-                " | [Source](${post.source})"
-            else ""
+            val source = if (post.source.isNotBlank()) {
+                post.source.split(' ').joinToString(" ", prefix = " | ") { singleSource ->
+                    if (urlPattern.matches(singleSource)) {
+                        "[Source]($singleSource)"
+                    } else { singleSource }
+                }
+            } else ""
 
             title = post.title
             description = """
-                        [Lien du post](https://gelbooru.com/index.php?page=post&s=view&id=${post.id})${optionalSource}
+                        [Lien du post](https://gelbooru.com/index.php?page=post&s=view&id=${post.id})$source
                         Rating: ${post.rating.displayName} | Score: ${post.score}
                     """.trimIndent()
             color = post.fetchProminentColor()
