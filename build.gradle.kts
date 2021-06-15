@@ -34,6 +34,8 @@ dependencies {
     implementation("dev.kord.x:emoji:0.5.0-SNAPSHOT")
 
     implementation("de.androidpit:color-thief:1.1.2")
+
+    implementation("org.apache.tika:tika-core:1.26")
 }
 
 tasks.withType<Jar> {

@@ -9,8 +9,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.apache.tika.Tika
 import java.io.InputStream
-import java.net.URLConnection
 import javax.imageio.ImageIO
 
 @Serializable
@@ -39,6 +39,7 @@ data class GelbooruPost(
 
     companion object {
         private val urlPattern = Regex("^(https://|http://)(?!-.)[^\\s/\$.?#].[^\\s]*$")
+        private val tika = Tika()
         private val prominentColorCache = mutableMapOf<Int, Color>()
 
         suspend fun EmbedBuilder.forPost(post: GelbooruPost) {
@@ -50,7 +51,7 @@ data class GelbooruPost(
                 }
             } else ""
 
-            val mimeType = URLConnection.guessContentTypeFromName(post.fileUrl)
+            val mimeType = tika.detect(post.fileUrl)
 
             title = post.title
             description = """
