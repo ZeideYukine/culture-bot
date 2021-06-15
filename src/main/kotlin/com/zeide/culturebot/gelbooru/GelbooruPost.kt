@@ -5,14 +5,12 @@ import de.androidpit.colorthief.ColorThief
 import dev.kord.common.Color
 import dev.kord.rest.builder.message.EmbedBuilder
 import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.utils.io.*
-import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.io.InputStream
+import java.net.URLConnection
 import javax.imageio.ImageIO
 
 @Serializable
@@ -52,13 +50,31 @@ data class GelbooruPost(
                 }
             } else ""
 
+            val mimeType = URLConnection.guessContentTypeFromName(post.fileUrl)
+
             title = post.title
             description = """
                         [Lien du post](https://gelbooru.com/index.php?page=post&s=view&id=${post.id})$source
                         Rating: ${post.rating.displayName} | Score: ${post.score}
                     """.trimIndent()
             color = post.fetchProminentColor()
-            image = post.fileUrl
+
+            when {
+                mimeType.startsWith("image") -> image = post.fileUrl
+                mimeType.startsWith("video") -> {
+                    field("Chargement impossible") {
+                        """Le post est une vidéo et Discord ne permet pas de charger des vidéos. 
+                            |[Lien direct de la vidéo](${post.fileUrl})""".trimMargin()
+                    }
+                }
+
+                else -> {
+                    field("Chargement impossible") {
+                        """Le post est une est un type inconnu. 
+                            |[Lien direct](${post.fileUrl})""".trimMargin()
+                    }
+                }
+            }
         }
     }
 }
