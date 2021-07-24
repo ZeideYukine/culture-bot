@@ -13,7 +13,6 @@ version = "1.0-ALPHA"
 
 repositories {
     mavenCentral()
-    maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
 dependencies {
@@ -30,8 +29,8 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
     implementation("io.github.microutils:kotlin-logging:2.0.8")
 
-    implementation("dev.kord:kord-core:0.7.x-SNAPSHOT")
-    implementation("dev.kord.x:emoji:0.5.0-SNAPSHOT")
+    implementation("dev.kord:kord-core:0.7.4")
+    implementation("dev.kord.x:emoji:0.5.0")
 
     implementation("de.androidpit:color-thief:1.1.2")
 
